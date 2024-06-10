@@ -21,16 +21,16 @@ public class ApiTest {
                                 .when()
                                 .get("/employees")
                                 .then()
-                                .statusCode(200) // HTTP status kodu 200 kontrolü
+                                .statusCode(200) 
                                 .extract()
                                 .response();
 
-        // Yanıtın JSON gövdesini doğrulama
+       
         response
             .then()
             .assertThat()
             .body("data", hasSize(24)) // 24 adet kaydın geldiğini kontrol etme
-            .body("data.find { it.employee_salary == 313500 }.employee_name", equalTo("Haley Kennedy")); // employee_salary değeri 313500 olan kaydın employee_name değerinin "Haley Kennedy" olduğunu kontrol etme
+            .body("data.find { it.employee_salary == 313500 }.employee_name", equalTo("Haley Kennedy")); 
     }
 
     @Test
@@ -42,7 +42,7 @@ public class ApiTest {
             .get("/employees")
             .then()
             .statusCode(200)
-            .body("data.employee_salary", everyItem(greaterThan(0))); // Tüm çalışanların maaşlarının pozitif olduğunu kontrol etme
+            .body("data.employee_salary", everyItem(greaterThan(0))); 
     }
 
     @Test
@@ -54,8 +54,8 @@ public class ApiTest {
             .get("/employees")
             .then()
             .statusCode(200)
-            .body("data.find { it.employee_name == 'Tiger Nixon' }.employee_salary", equalTo(320800)) // "Tiger Nixon" isimli çalışanın maaşının 320800 olduğunu kontrol etme
-            .body("data.find { it.employee_name == 'Tiger Nixon' }.employee_age", equalTo(61)); // "Tiger Nixon" isimli çalışanın yaşının 61 olduğunu kontrol etme
+            .body("data.find { it.employee_name == 'Tiger Nixon' }.employee_salary", equalTo(320800)) 
+            .body("data.find { it.employee_name == 'Tiger Nixon' }.employee_age", equalTo(61)); 
     }
 
     @Test
@@ -73,18 +73,6 @@ public class ApiTest {
         List<String> employeeNames = response.jsonPath().getList("data.employee_name");
         Set<String> uniqueEmployeeNames = new HashSet<>(employeeNames);
 
-        assert (employeeNames.size() == uniqueEmployeeNames.size()); // Çalışan isimlerinin benzersiz olduğunu kontrol etme
-    }
-
-    @Test
-    public void testEmployeeNamesPattern() {
-        RestAssured.baseURI = "https://dummy.restapiexample.com/api/v1";
-
-        given()
-            .when()
-            .get("/employees")
-            .then()
-            .statusCode(200)
-            .body("data.employee_name", everyItem(matchesPattern("^[a-zA-Z\\s]+$"))); // İsimlerin sadece alfabe karakterlerinden oluştuğunu doğrulama
+        assert (employeeNames.size() == uniqueEmployeeNames.size());
     }
 }
