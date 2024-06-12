@@ -1,5 +1,7 @@
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -11,64 +13,64 @@ import static org.hamcrest.Matchers.*;
 
 public class ApiTest {
 
-    @Test
-    public void testEmployeesApi() {
-        // Base URL'i ayarlıyoruz
+    @BeforeAll
+    public static void setUp() {
         RestAssured.baseURI = "https://dummy.restapiexample.com/api/v1";
+    }
 
-        // GET isteği gönder ve yanıtı al
-        Response response = given()
-                                .when()
-                                .get("/employees")
-                                .then()
-                                .statusCode(200) 
-                                .extract()
-                                .response();
+    @Test
+    @Order(1)
+    public void testEmployeesApi() {
+        Response response =
+            given()
+                .when()
+                .get("/employees")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
 
-       
         response
             .then()
             .assertThat()
-            .body("data", hasSize(24)) // 24 adet kaydın geldiğini kontrol etme
-            .body("data.find { it.employee_salary == 313500 }.employee_name", equalTo("Haley Kennedy")); 
+            .body("data", hasSize(24))
+            .body("data.find { it.employee_salary == 313500 }.employee_name", equalTo("Haley Kennedy"));
     }
 
     @Test
+    @Order(2)
     public void testEmployeeSalariesArePositive() {
-        RestAssured.baseURI = "https://dummy.restapiexample.com/api/v1";
-
         given()
             .when()
             .get("/employees")
             .then()
             .statusCode(200)
-            .body("data.employee_salary", everyItem(greaterThan(0))); 
+            .body("data.employee_salary", everyItem(greaterThan(0)));
     }
 
     @Test
+    @Order(3)
     public void testSpecificEmployeeDetails() {
-        RestAssured.baseURI = "https://dummy.restapiexample.com/api/v1";
-
         given()
             .when()
             .get("/employees")
             .then()
             .statusCode(200)
-            .body("data.find { it.employee_name == 'Tiger Nixon' }.employee_salary", equalTo(320800)) 
-            .body("data.find { it.employee_name == 'Tiger Nixon' }.employee_age", equalTo(61)); 
+            .body("data.find { it.employee_name == 'Tiger Nixon' }.employee_salary", equalTo(320800))
+            .body("data.find { it.employee_name == 'Tiger Nixon' }.employee_age", equalTo(61));
     }
 
     @Test
+    @Order(4)
     public void testEmployeeNamesAreUnique() {
-        RestAssured.baseURI = "https://dummy.restapiexample.com/api/v1";
-
-        Response response = given()
-                                .when()
-                                .get("/employees")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .response();
+        Response response =
+            given()
+                .when()
+                .get("/employees")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
 
         List<String> employeeNames = response.jsonPath().getList("data.employee_name");
         Set<String> uniqueEmployeeNames = new HashSet<>(employeeNames);
